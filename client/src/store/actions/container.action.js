@@ -1,5 +1,6 @@
 import { request } from '../../utilities/request'
 import { toaster } from 'evergreen-ui'
+import { logout } from '../../utilities/auth'
 
 export const genericContainer = payload => ({
   type: 'GENERIC_CONTAINER',
@@ -26,7 +27,7 @@ export const toggleModal = payload => ({
   payload
 })
 
-export const getContainers = (status = 'active') => {
+export const getContainers = (status = 'running') => {
   return dispatch => {
     dispatch(genericContainer({
       loading: status,
@@ -37,6 +38,9 @@ export const getContainers = (status = 'active') => {
     }))
     request('get', `container/fetch?status=${status}`, {})
       .then(response => {
+        console.log(response)
+        //if (response.status == 401) {
+        //}
         dispatch(genericContainer({
           loading: false,
           containers: response.data,
@@ -44,6 +48,8 @@ export const getContainers = (status = 'active') => {
           containerListLoading: false,
         }))
       }).catch(error => {
+        logout()
+        window.location.reload(true)
         dispatch(genericContainer({
           loading: false,
           pageError: true,
@@ -56,10 +62,10 @@ export const getContainers = (status = 'active') => {
 export const toggleContainer = (container, status, hideToaster) => {
   return dispatch => {
     dispatch(updateContainer({
-      containerId: container.shortId,
+      containerId: container.id,
       data: { stateToggling: true },
     }))
-    request('get', `container/command?container=${container.shortId}&command=${status}`)
+    request('get', `container/command?container=${container.id}&command=${status}`)
       .then(res => {
         const State = {
           ...container.State,
@@ -70,7 +76,7 @@ export const toggleContainer = (container, status, hideToaster) => {
           }
         }
         dispatch(updateContainer({
-          containerId: container.shortId,
+          containerId: container.id,
           data: { 
             State,
             stateToggling: false,
@@ -78,17 +84,17 @@ export const toggleContainer = (container, status, hideToaster) => {
         }))
         if(! !!hideToaster) {
           toaster.success(
-            `Container ${container.Name} has been ${status === 'start'? 'started' : 'stopped'}.`,
+            `Container ${container.name} has been ${status === 'start'? 'started' : 'stopped'}.`,
             { duration: 5 }
           )
         }
       })
       .catch( ex => {
         dispatch(updateContainer({
-          containerId: container.shortId,
+          containerId: container.id,
           data: { stateToggling: false },
         }))
-        toaster.warning(`There is problem ${status === 'start'? 'starting' : 'stopping'} container ${container.Name}`,{duration: 5})
+        toaster.warning(`There is problem ${status === 'start'? 'starting' : 'stopping'} container ${container.name}`,{duration: 5})
       })
   }
 }
@@ -96,7 +102,7 @@ export const toggleContainer = (container, status, hideToaster) => {
 export const restartContainer = (container, status) => {
   return dispatch => {
     dispatch(updateContainer({
-      containerId: container.shortId,
+      containerId: container.id,
       data: { 
         stateToggling: true,
         State: {
@@ -107,13 +113,13 @@ export const restartContainer = (container, status) => {
         }
       },
     }))
-    request('get', `container/command?container=${container.shortId}&command=${status}`)
+    request('get', `container/command?container=${container.id}&command=${status}`)
       .then(res => {
         dispatch(updateContainer({
-          containerId: container.shortId,
+          containerId: container.id,
           data: { 
             State: {
-              ...container.State,
+              ...container.running,
               ...{
                 Running: true
               }
@@ -121,11 +127,11 @@ export const restartContainer = (container, status) => {
             stateToggling: false,
           },
         }))
-        toaster.success(`Container ${container.Name} has been restarted.`,{ duration: 5 })
+        toaster.success(`Container ${container.name} has been restarted.`,{ duration: 5 })
       })
       .catch( ex => {
         dispatch(updateContainer({
-          containerId: container.shortId,
+          containerId: container.id,
           data: { 
             State: {
               ...container.State,
@@ -136,21 +142,21 @@ export const restartContainer = (container, status) => {
             stateToggling: false,
           },
         }))
-        toaster.warning(`There is problem restarting container ${container.Name}`,{duration: 5})
+        toaster.warning(`There is problem restarting container ${container.name}`,{duration: 5})
       })
   }
 }
 
 export const deleteContainer = (container, command) => (dispatch, getState)=>{
-    request('get', `container/command?container=${container.shortId}&command=${command}`)
+    request('get', `container/command?container=${container.id}&command=${command}`)
       .then(res => {
         dispatch(removeContainer({
-          containerId: container.shortId,
+          containerId: container.id,
           showModal: !getState().container.showModal,
           selectedContainer: {}
         }))
         toaster.success(
-          `Container ${container.Name} is no more!!!.`,
+          `Container ${container.name} is no more!!!.`,
           {
             duration: 5
           }
@@ -164,7 +170,7 @@ export const getLog = (container) => {
       container: container,
       isShowingSideSheet: false,
     }))
-    request('get', `container/logs?container=${container.shortId}`)
+    request('get', `container/logs?container=${container.id}`)
       .then(response => {
         dispatch(updateContainerLog({
           container: container,

@@ -18,8 +18,8 @@ class SecondaryNavBar extends React.PureComponent {
       height={26}
       options={[
         { label: loading === 'all' ? <Spinner size={16} /> : 'All', value: 'all' },
-        { label: loading === 'active' ? <Spinner size={16} /> : 'Active', value: 'active' },
-        { label: loading === 'stopped' ? <Spinner size={16} /> : 'Stopped', value: 'stopped' }
+        { label: loading === 'running' ? <Spinner size={16} /> : 'Active', value: 'running' },
+        { label: loading === 'exited' ? <Spinner size={16} /> : 'Stopped', value: 'exited' }
       ]}
       value={segment}
       onChange={value => {

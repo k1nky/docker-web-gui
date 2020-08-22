@@ -5,9 +5,20 @@ import '../../components/container/style/card.css'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { genericImage, runImageToContainer, toggleImageDeleteModal } from '../../store/actions/image.action'
-
+import CreatedAt from '../createdAt'
 
 class ImageCard extends React.PureComponent {
+
+  bytesToString(value) {
+    var metrics = ["B", "KB", "MB", "GB"]
+    var str = value + metrics[0]
+    for (var i = 0; i < metrics.length; i++) {
+      value = Math.floor(value / 1024)
+      if (value == 0) break      
+      str = value + metrics[i+1]
+    }
+    return str
+  }
 
   render () {
     const { image, activeIndex, genericImage, index, toggleImageDeleteModal, runImageToContainer } = this.props
@@ -25,11 +36,11 @@ class ImageCard extends React.PureComponent {
             })}>
             <Pane display="flex">
                <Pane display="flex" justifyContent="center" alignItems="center">
-                  <Heading size={400}>{`${image.Repository != '<none>'? image.Repository : 'No Repository'}: ${ image.Tag != '<none>' ? image.Tag : 'No Tag'}`}</Heading>
+                  <Heading size={400}>{`${image.tags != ''? image.tags : 'No Repository'}`}</Heading>
                </Pane>
-               <Badge backgroundColor="#e7e9ef" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>{image.ID}</Badge>
-               <Badge backgroundColor="#d4eee3" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>{image.Size}</Badge>
-               <Badge backgroundColor="#deebf7" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>{image.CreatedSince}</Badge>
+               <Badge backgroundColor="#e7e9ef" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>{image.id.replace("sha256:","").slice(0, 16)}</Badge>
+               <Badge backgroundColor="#d4eee3" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>{this.bytesToString(image.size)}</Badge>
+               <CreatedAt time={image.created} />
             </Pane>
             { active && 
                <Pane display="flex" marginTop={12}>

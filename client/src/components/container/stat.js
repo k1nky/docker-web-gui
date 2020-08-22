@@ -5,10 +5,15 @@ import { connect } from 'react-redux'
 
 class ContainerStat extends React.PureComponent {
   
-  getMemoryUsage(memory) {
-    [memory] = memory.split('/')
-    let memoryFormated = memory.replace(/[a-zA-Z]/g, '').trim()
-    return Number(memoryFormated).toFixed(1) + 'mb'
+  bytesToString(value) {
+    var metrics = ["B", "KB", "MB", "GB"]
+    var str = value + metrics[0]
+    for (var i = 0; i < metrics.length; i++) {
+      value = Math.floor(value / 1024)
+      if (value == 0) break      
+      str = value + metrics[i+1]
+    }
+    return str
   }
 
   renderBadges () {
@@ -18,13 +23,13 @@ class ContainerStat extends React.PureComponent {
     return data 
       ? <>
         <Badge backgroundColor="#deebf7" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>
-          cpu {data.cpu_percentage}
+          cpu {parseFloat(data.cpu_percentage).toFixed(2)} %
         </Badge>
         <Badge backgroundColor="#ebe7f8" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>
-          ram {this.getMemoryUsage(data.memory_usage)}
+          ram {this.bytesToString(data.memory_usage)} / {this.bytesToString(data.memory_limit)}
         </Badge>
         <Badge backgroundColor="#ebe7f8" fontWeight="bold" borderRadius={16} paddingLeft={10} fontSize={11} paddingRight={10} marginLeft={10} marginTop={3}>
-          net {this.getMemoryUsage(data.network_io)}
+          net {this.bytesToString(data.network_io[0])} / {this.bytesToString(data.network_io[1])}
         </Badge>
       </>
       : null

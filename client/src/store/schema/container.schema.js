@@ -3,7 +3,7 @@ export default {
   loading: false,
   containerListLoading: true,
   pageError: false,
-  segment: 'active',
+  segment: 'running',
   activeIndex: 0,
   isShowingSideSheet: false,
   logData: {},

@@ -56,7 +56,7 @@ class Modal extends Component {
                         </Pane>
                      </Pane>
                      <Pane display="flex" alignItems="center" justifyContent="center">
-                        <Heading size={600}>{container ? container.Name : image.ID}</Heading>
+                        <Heading size={600}>{container ? container.name : image.ID}</Heading>
                      </Pane>
                      <Pane display="flex" marginTop={10} justifyContent="center" alignItems="center">
                         <Pane>

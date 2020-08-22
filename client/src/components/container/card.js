@@ -29,7 +29,7 @@ class ContainerCard extends React.PureComponent {
           <Button marginRight={5} 
             height={22} 
             iconBefore="trash" 
-            disabled={container.State.Running}
+            disabled={container.running}
             onClick={() => {
               toggleDeleteModal(container)
             }}>
@@ -45,8 +45,8 @@ class ContainerCard extends React.PureComponent {
   renderStats (container) {
     const { showNewGroupForm } = this.props
     if(!showNewGroupForm) {
-      if(container.State.Running) {
-        return <ContainerStat containerID={container.shortId} />
+      if(container.running) {
+        return <ContainerStat containerID={container.id} />
       }
     }
   }
@@ -88,7 +88,7 @@ class ContainerCard extends React.PureComponent {
                 ? <ContainerSelector container={container} />
                 : <ContainerSwitch container={container} />
             }
-            <Heading size={400}>{container.Name}</Heading>
+            <Heading size={400}>{container.name}</Heading>
             <Badge 
               backgroundColor="#e7e9ef" 
               fontWeight="bold" 
@@ -97,9 +97,9 @@ class ContainerCard extends React.PureComponent {
               fontSize={11} 
               paddingRight={10} 
               marginLeft={10} 
-              marginTop={3}>{container.shortId}
+              marginTop={3}>{container.id.slice(0, 16)}
             </Badge>
-            <CreatedAt time={container.Created} />
+            <CreatedAt time={container.created} />
           </Pane>
           { this.renderInfo(container) }
         </Pane>

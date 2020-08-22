@@ -8,7 +8,7 @@ import { toggleContainer } from '../../store/actions/container.action'
 class ContainerSwitch extends React.PureComponent {
   render () {
     const { container, toggleContainer } = this.props
-    const command = container.State.Running
+    const command = container.running
       ? 'stop'
       : 'start'
     const disabled = !!container.stateToggling
@@ -16,7 +16,7 @@ class ContainerSwitch extends React.PureComponent {
       marginRight={10} 
       height={18} 
       marginTop={2}
-      checked={container.State.Running} 
+      checked={container.running} 
       disabled={disabled}
       onChange={() => {
         toggleContainer(container, command)
